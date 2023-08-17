@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style type="text/css">
+        html {
+            font-size: 17px;
+            overflow-y: hidden;
+        }
+
+        @supports (font: -apple-system-body) {
+            html {
+                font: -apple-system-body;
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, Arial, sans-serif;
+            display: block !important;
+            /* preventing flash of unstyled content */
+        }
+
+        a {
+            color: #5381c3;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.7em;
+            margin: 0;
+            line-height: 1.2em;
+            font-weight: normal;
+            margin-bottom: 15px;
+            position: relative;
+            display: block;
+            margin-top: 50px;
+            border-radius: 20px;
+            /* border: solid 3px #5381c3;
+            padding: 16px; */
+        }
+
+        .step-container {
+            height: 100vh;
+            padding: 10px 20px 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        p {
+            font-size: 1em;
+            line-height: 1.3em;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 16px 30px;
+            background: #5381c3;
+            font-size: 1em;
+            color: #FFF;
+            font-weight: bold;
+            border: solid 1px #5381c3;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            /* margin-top: auto; */
+            margin-bottom: 30px;
+        }
+
+        #balloon {
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            background-color: #5381c3;
+            border-radius: 50%;
+            transition: all 30ms linear;
+
+        }
+
+        #button-container {
+            display: flex;
+        }
+
+        #collect-btn {
+            background: #50C878;
+            border: solid 1px #50C878;
+        }
+
+        #pump5-btn {
+            margin-right: 15px;
+        }
+
+        #next-btn {
+            background: #50C878;
+            border: solid 1px #50C878;
+            padding: 16px 100px;
+        }
+
+        #done-btn {
+            padding: 16px 100px;
+        }
+
+        #summary {
+            font-size: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body style="display:none">
+
+    <div class="step-container">
+        <h1 id="header">
+            Task completed
+        </h1>
+        <div id="summary">
+
+        </div>
+
+
+        <div id="button-container">
+            <button id="collect-btn" onclick="renderSummary();">See summary</button>
+        </div>
+
+    </div>
+
+
+    <script>
+        const header = document.getElementById("header");
+        let totalEarnings = 0;
+
+        function removeButtons() {
+            const collect = document.getElementById("collect-btn");
+            collect.remove();
+        }
+
+
+        function renderSummary() {
+            totalEarnings = getTotalEarnings();
+            const summary = document.getElementById("summary");
+            summary.innerHTML = `
+            🎉 You've earned a total of ${totalEarnings} points 🎉
+            `;
+            removeButtons();
+            makeDoneButton();
+        }
+
+        function makeDoneButton() {
+            const buttonContainer = document.getElementById('button-container');
+            buttonContainer.innerHTML = `
+            <button id="done-btn" onclick="sendResults();">Done</button>
+            `;
+        }
+
+        function sendResults() {
+            const result = {};
+            result["totalEarnings"] = 99;
+            // result["totalEarnings"] = getTotalEarnings();
+            window.webkit.messageHandlers.ResearchKit.postMessage(JSON.stringify(result));
+        }
+
+
+
+        function getTotalEarnings() {
+            let lastTotalEarnings = 0;
+            const stepResultLength = window.taskResult.StepResults.length;
+            if (stepResultLength >= 2) {
+                // get most recent stepResult
+                for (var i = 0; i < stepResultLength; i++) {
+                    var stepResult = window.taskResult.StepResults[i];
+                    for (var j = 0; j < stepResult.QuestionResults.length; j++) {
+                        var questionResult = stepResult.QuestionResults[j];
+                        var answer = questionResult.Answer;
+                        if (questionResult.Result) {
+                            answer = questionResult.Result;
+                        }
+                        lastTotalEarnings = JSON.parse(answer).totalEarnings;
+
+                    }
+
+                }
+
+            }
+            return lastTotalEarnings;
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style type="text/css">
+        html {
+            font-size: 17px;
+            overflow-y: hidden;
+        }
+
+        @supports (font: -apple-system-body) {
+            html {
+                font: -apple-system-body;
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, Arial, sans-serif;
+            display: block !important;
+            /* preventing flash of unstyled content */
+        }
+
+        a {
+            color: #5381c3;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.7em;
+            margin: 0;
+            line-height: 1.2em;
+            font-weight: normal;
+            margin-bottom: 15px;
+            position: relative;
+            display: block;
+            margin-top: 50px;
+            border-radius: 20px;
+            /* border: solid 3px #5381c3;
+            padding: 16px; */
+        }
+
+        .step-container {
+            height: 100vh;
+            padding: 10px 20px 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        p {
+            font-size: 1em;
+            line-height: 1.3em;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 16px 30px;
+            background: #5381c3;
+            font-size: 1em;
+            color: #FFF;
+            font-weight: bold;
+            border: solid 1px #5381c3;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            /* margin-top: auto; */
+            margin-bottom: 30px;
+        }
+
+        #balloon {
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            background-color: #5381c3;
+            border-radius: 50%;
+            transition: all 30ms linear;
+
+        }
+
+        #button-container {
+            display: flex;
+        }
+
+        #collect-btn {
+            margin-left: 15px;
+            background: #50C878;
+            border: solid 1px #50C878;
+        }
+
+        #pump5-btn {
+            margin-right: 15px;
+        }
+
+        #next-btn {
+            background: #50C878;
+            border: solid 1px #50C878;
+            width: 70vw;
+        }
+
+        #popped {
+            font-size: 2.5rem;
+            display: block;
+        }
+    </style>
+</head>
+
+<body style="display:none">
+
+
+    <div class="step-container">
+        <h1 id="header">
+            you will receive: 0 points
+        </h1>
+        <div id="balloon">
+        </div>
+
+        <div id="button-container">
+            <!-- <button id="pump5-btn" onclick="pump(5);">pump x5</button> -->
+            <button id="pump-btn" onclick="pump(1);">pump x1</button>
+            <button id="collect-btn" onclick="collectReward();">collect reward</button>
+        </div>
+
+    </div>
+
+
+    <script>
+        const balloon = document.getElementById("balloon");
+        let reward = 0;
+        const header = document.getElementById("header");
+        let initialSize = 100;
+        const increment = 5;
+        let numberOfPumps = 0;
+        const breakPoint = 8;
+        const result = {};
+        let totalEarnings = 0;
+        // const balloonPopsAt = Math.floor(Math.random() * (breakPoint));
+        const data = [
+            21, 17, 15, 20, 10, 24, 20, 20, 14, 22, 18, 15, 15, 14, 20, 14, 19, 17, 20, 17, 6, 16, 16, 15, 19, 17, 12, 13, 21, 19, 14, 20, 22, 11, 16, 12, 21, 20, 22, 22, 15, 12, 16, 23, 19, 17, 18, 17, 20, 19, 23, 13, 11, 14, 17, 19, 19, 19, 23, 15, 16, 17, 19, 20, 18, 20, 22, 22, 19, 20, 14, 23, 19, 21, 19, 12, 18, 20, 20, 14, 14, 17, 26, 16, 21, 23, 19, 20, 20, 16, 19, 18, 19, 6, 22, 20, 18, 21, 18, 18, 24, 19, 17, 22, 19, 18, 24, 18, 21, 18, 22, 19, 22, 15, 14, 22, 21, 13, 15, 23, 17, 18, 21, 25, 24, 21, 14, 16, 14, 20, 18, 20, 20, 15, 23, 15, 8, 17, 16, 16, 16, 22, 20, 22, 16, 14, 15, 19, 21, 24, 17, 17, 21, 19, 19, 20, 21, 17, 14, 21, 21, 18, 15, 13, 26, 17, 19, 17, 20, 21, 22, 18, 20, 13, 18, 16, 16, 20, 14, 13, 15, 21, 15, 24, 19, 14, 20, 21, 9, 8, 18, 21, 14, 19, 19, 13, 21, 16, 21, 21, 17, 21, 19, 13, 19, 21, 20, 21, 16, 21, 8, 17, 13, 25, 18, 15, 7, 10, 13, 5, 18, 14, 21, 19, 17, 19, 21, 11, 19, 20, 19, 15, 17, 19, 18, 23, 7, 16, 20, 19, 18, 17, 10, 19, 19, 20, 21, 19, 18, 13, 22, 23, 17, 17, 19, 15, 23, 13, 20, 22, 14, 16, 25, 14, 17, 10, 13, 20, 19, 12, 22, 16, 18, 19, 12, 20, 23, 14, 13, 23, 22, 13, 16, 19, 17, 17, 19, 23, 18, 21, 14, 17, 22, 18, 21, 15, 17, 21, 24, 20, 15, 16, 15, 14, 22, 15, 22, 14, 16, 19, 13, 16, 19, 21, 15, 20, 19, 23, 19, 22, 26, 19, 19, 21, 10, 20, 20, 22, 16, 25, 22, 16, 19, 19, 22, 12, 22, 21, 14, 17, 13, 17, 17, 12, 23, 23, 17, 18, 19, 17, 19, 17, 21, 13, 17, 22, 22, 23, 21, 23, 16, 20, 17, 22, 11, 18, 11, 13, 18, 7, 18, 22, 24, 14, 21, 19, 12, 18, 23, 19, 16, 20, 15, 19, 15, 18, 18, 16, 21, 20, 23, 23, 24, 18, 20, 23, 16, 15, 24, 21, 20, 19, 19, 14, 13, 13, 16, 19, 15, 10, 10, 22, 13, 20, 22, 24, 18, 15, 15, 21, 15, 17, 21, 21, 14, 15, 18, 21, 23, 15, 20, 24, 18, 17, 22, 18, 19, 15, 15, 25, 19, 19, 16, 13, 19, 20, 16, 22, 21, 18, 19, 13, 24, 13, 15, 11, 17, 11, 25, 24, 16, 21, 12, 17, 18, 16, 4, 15, 22, 23, 20, 19, 25, 20, 19, 19, 19, 19, 20, 18, 12, 16, 11, 22, 19, 20, 17, 21, 16, 22, 10, 18, 21, 17, 22, 23, 19, 23, 17, 13, 21, 16, 20, 15, 20, 12, 19, 17, 17, 21, 21, 20, 11, 16, 12, 21, 18, 15, 12, 17, 15, 24, 11, 19, 14, 23, 18, 13, 20, 19, 18, 21, 20, 12, 17, 21, 15, 22, 17, 21, 12, 12, 17, 13, 18, 24, 15, 16, 19, 17, 17, 21, 15, 23, 18, 7, 16, 18, 21, 21, 20, 17, 18, 22, 22, 17, 17, 15, 13, 11, 9, 20, 22, 14, 23, 14, 20, 14, 23, 15, 21, 18, 23, 20, 24, 22, 21, 20, 17, 14, 22, 21, 13, 15, 19, 15, 23, 16, 15, 13, 19, 22, 19, 16, 23, 22, 18, 21, 19, 20, 18, 17, 22, 24, 18, 15, 20, 15, 24, 17, 20, 18, 17, 17, 22, 18, 15, 20, 16, 19, 13, 15, 18, 18, 20, 23, 12, 22, 21, 23, 17, 16, 21, 16, 23, 12, 17, 18, 15, 19, 20, 17, 15, 20, 18, 16, 21, 12, 11, 22, 19, 19, 21, 19, 17, 19, 25, 21, 17, 16, 25, 19, 9, 20, 16, 15, 20, 21, 21, 16, 19, 9, 18, 18, 16, 20, 16, 20, 14, 19, 16, 19, 20, 22, 22, 20, 19, 21, 18, 20, 21, 21, 15, 19, 24, 17, 17, 18, 12, 20, 15, 21, 17, 18, 18, 19, 14, 23, 16, 19, 16, 19, 18, 18, 18, 22, 18, 18, 22, 20, 12, 18, 22, 11, 14, 12, 23, 18, 20, 15, 18, 20, 16, 20, 22, 19, 17, 16, 19, 21, 20, 17, 17, 19, 18, 24, 22, 20, 19, 14, 23, 18, 19, 23, 20, 14, 12, 22, 23, 15, 18, 17, 17, 15, 19, 20, 15, 19, 12, 12, 20, 14, 22, 4, 20, 24, 14, 21, 23, 10, 20, 21, 13, 21, 18, 18, 21, 12, 24, 18, 17, 16, 17, 21, 17, 15, 14, 19, 21, 23, 18, 19, 24, 15, 23, 14, 18, 13, 18, 17, 25, 20, 15, 21, 21, 10, 15, 18, 19, 18, 19, 15, 18, 15, 17, 18, 21, 18, 7, 25, 18, 10, 24, 13, 19, 21, 17, 16, 14, 17, 21, 14, 15, 22, 21, 18, 16, 19, 23, 11, 21, 17, 23, 19, 24, 21, 19, 20, 20, 18, 18, 22, 21, 15, 24, 11, 22, 22, 17, 23, 23, 21, 13, 13, 22, 21, 14, 24, 18, 19, 13, 18, 27, 11, 19, 18, 24, 23, 20, 20, 19, 12, 15, 26, 23, 12, 24, 12, 17, 20, 17, 19, 23, 17, 20, 15, 19, 9, 12, 16, 21, 20, 23, 17, 14, 18, 23, 22, 20, 15, 8, 21, 20, 17, 16, 17, 22, 17, 23, 18, 21, 22, 21, 21, 23, 14, 23, 17, 19, 19, 25, 12, 20, 21, 19, 13, 18, 21, 19, 21, 16, 17, 23, 16, 14, 19, 24, 22, 14, 22, 16, 13, 20, 17, 18, 18, 14, 16, 18, 23, 20, 14, 19, 20, 22, 21, 15, 25, 21, 16, 25, 23, 20, 24, 16, 18, 19, 16, 15, 21
+
+        ];
+        let balloonPopsAt = data[Math.floor(Math.random() * data.length)];
+
+
+        function pump(num) {
+            balloon.innerText = "";
+            // generate a random number between 0 and breakpoint - numberOfPumps
+            // x = Math.floor(Math.random() * (breakPoint - numberOfPumps));
+            numberOfPumps += num;
+            if (numberOfPumps >= balloonPopsAt) {
+                // balloon popped
+                loseReward();
+            } else {
+                // balloon didn't pop
+                balloon.style.width = `${initialSize + increment * numberOfPumps}px`;
+                balloon.style.height = `${initialSize + increment * numberOfPumps}px`;
+                reward = increment * numberOfPumps;
+                header.innerText = `${reward} points`;
+            }
+
+        }
+
+        function loseReward() {
+            balloon.innerHTML = `
+            <p>You lost the <strong>${reward}</strong> points you earned in this trial 😞</p>
+            `;
+            balloon.style.color = '#EE4B2B';
+            balloon.style.fontSize = '20px'
+            reward = 0;
+            header.style.color = "#EE4B2B";
+            updateAppState("popped");
+        }
+
+        function collectReward() {
+            balloon.innerHTML = `
+            <p style='color:black'>You could have given <strong>${-1 + balloonPopsAt - reward / 5}</strong> more pumps, with the max possible points of <strong>${(balloonPopsAt - 1) * 5}</strong></p>
+            🤔`;
+            balloon.style.color = "#50C878";
+            balloon.style.fontSize = '20px';
+            header.style.color = "#50C878";
+            updateAppState("collect");
+        }
+
+        function updateAppState(state) {
+            balloon.style.backgroundColor = 'white';
+            balloon.style.width = "200px";
+            removeButtons();
+            makeNextButton();
+            totalEarnings = getTotalEarnings();
+            if (state == "popped") {
+                header.innerHTML = `
+            <strong id="popped">💥 Balloon Popped!</strong>
+<div style='color:black;margin-top:15px;'>your total points: ${totalEarnings} points</div>
+`;
+            } else {
+                header.innerHTML = `
+<strong id="popped">🎉${reward} points collected!</strong>
+<div style='color:black;margin-top:15px;'>your total points: ${totalEarnings} points</div>
+`;
+            }
+
+
+            // setHeader();
+        }
+
+        function removeButtons() {
+            const pump = document.getElementById("pump-btn");
+            // const fivePump = document.getElementById("pump5-btn");
+            const collect = document.getElementById("collect-btn");
+            pump.remove();
+            // fivePump.remove();
+            collect.remove();
+        }
+
+        function makeNextButton() {
+            const buttonContainer = document.getElementById('button-container');
+            const button = document.createElement('button');
+            button.innerText = "next";
+            button.id = "next-btn"
+            button.onclick = sendResults;
+            buttonContainer.appendChild(button)
+        }
+
+        function sendResults() {
+            result["thisRoundEarnings"] = reward;
+            result["numberOfPumps"] = numberOfPumps;
+            result["totalEarnings"] = totalEarnings;
+            result["balloonPopsAt"] = balloonPopsAt;
+
+            // dev mode
+            // console.log(result)
+
+            // app mode
+            window.webkit.messageHandlers.ResearchKit.postMessage(JSON.stringify(result));
+        }
+
+        function getTotalEarnings() {
+            let lastTotalEarnings = 0;
+            const stepResultLength = window.taskResult.StepResults.length;
+            if (stepResultLength >= 2) {
+                // get most recent stepResult
+                for (var i = 0; i < stepResultLength; i++) {
+                    var stepResult = window.taskResult.StepResults[i];
+                    for (var j = 0; j < stepResult.QuestionResults.length; j++) {
+                        var questionResult = stepResult.QuestionResults[j];
+                        var answer = questionResult.Answer;
+                        if (questionResult.Result) {
+                            answer = questionResult.Result;
+                        }
+                        lastTotalEarnings = JSON.parse(answer).totalEarnings;
+
+                    }
+
+                }
+
+            }
+            return lastTotalEarnings + reward;
+        }
+        /*
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        */
+
+        /*
+        function setHeader() {
+            var html = "<ul>";
+            if (!window.taskResult.StepResults.length) {
+
+                html += "<li>" + ": <strong>" + "this is the first question, dummy" + "</strong></li>";
+
+
+            } else {
+
+
+                for (var i = 0; i < window.taskResult.StepResults.length; i++) {
+                    var stepResult = window.taskResult.StepResults[i];
+                    html += "<li>" + escapeHtml(stepResult.Identifier) + "<ul>";
+                    for (var j = 0; j < stepResult.QuestionResults.length; j++) {
+                        var questionResult = stepResult.QuestionResults[j];
+                        var answer = questionResult.Answer;
+
+                        if (questionResult.Result) {
+                            answer = questionResult.Result;
+                        }
+
+                        html += "<li>" + escapeHtml(questionResult.Identifier) + ": <strong>" + escapeHtml(answer) + "</strong></li>";
+                    }
+
+                    html += "</ul></li>";
+                }
+
+
+
+            }
+
+            html += "</ul>";
+            document.getElementById('header').innerHTML = html;
+        }
+        */
+
+
+
+    </script>
+</body>
+
+</html>

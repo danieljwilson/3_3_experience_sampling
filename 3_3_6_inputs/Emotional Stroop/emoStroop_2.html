@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style type="text/css">
+        html {
+            font-size: 17px;
+            overflow-y: hidden;
+        }
+
+        @supports (font: -apple-system-body) {
+            html {
+                font: -apple-system-body;
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, Arial, sans-serif;
+            display: block !important;
+            /* preventing flash of unstyled content */
+        }
+
+        a {
+            color: #5381c3;
+            text-decoration: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.7em;
+            margin: 0;
+            line-height: 1.2em;
+            font-weight: normal;
+            margin-bottom: 15px;
+            position: relative;
+            display: block;
+            margin-top: 50px;
+        }
+
+        .step-container {
+            height: 100vh;
+            padding: 10px 20px 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        p {
+            font-size: 1em;
+            line-height: 1.3em;
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 16px 32px;
+            background: #5381c3;
+            font-size: 1em;
+            color: #FFF;
+            font-weight: bold;
+            border: solid 1px #5381c3;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 30px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+
+        .button-group {
+            display: flex;
+        }
+
+        #imageContainer {
+            font-size: 1.5rem;
+            /* background-color: #D3D3D3; */
+            min-width: 160px;
+            min-height: 40px;
+        }
+
+        img {
+            filter: grayscale(100%) brightness(150%);
+            min-height: 65vh;
+            border-radius: 30px;
+
+        }
+
+        .centered {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 3rem;
+        }
+    </style>
+
+</head>
+
+<body style="display: block;">
+    <div class="step-container">
+        <h1 class="title">
+            Stroop task
+        </h1>
+
+        <div id="imageContainer">
+
+
+
+        </div>
+        <div class="button-group">
+            <button id="angry" class="button" onclick="checkEmotion('angry');">A</button>
+            <button id="happy" class="button" onclick="checkEmotion('happy');">H</button>
+            <button id="sad" class="button" onclick="checkEmotion('sad');">S</button>
+        </div>
+
+    </div>
+    <script>
+        const result = {};
+        let isActive = false;
+
+
+        function generateImage() {
+            const sadImages = [
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad1.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad10.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad2.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad3.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad4.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad5.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad6.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad7.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad8.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/sad9.jpeg'
+            ];
+            const angryImages = [
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry1.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry10.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry2.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry3.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry4.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry5.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry6.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry7.jpeg",
+                "https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry8.jpeg",
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/angry9.jpeg'
+            ];
+            const happyImages = [
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy1.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy10.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy2.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy3.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy4.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy5.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy6.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy7.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy8.jpeg',
+                'https://filedn.com/ltpGl4CBYf5Hf3ADcupJL7B/emostroop_img/happy9.jpeg'
+            ];
+            const imageMap = {
+                0: sadImages,
+                1: angryImages,
+                2: happyImages
+            }
+            const emotionList = [
+                "sad",
+                "angry",
+                "happy"
+            ]
+            const min = 0;
+            const max = 2;
+            const rand = Math.floor(Math.random() * (max - min + 1) + min);
+            const imageList = imageMap[rand];
+
+            const randomImage = imageList[Math.floor(Math.random() * imageList.length)];
+            const randomImageEmotion = emotionList[rand];
+            const randomText = emotionList[Math.floor(Math.random() * emotionList.length)];
+            result["emotion"] = randomImageEmotion;
+            result["text"] = randomText;
+            const imageContainer = document.getElementById("imageContainer");
+            const img = document.createElement('img');
+            const text = document.createElement('p');
+            text.classList.add('centered')
+            text.innerText = randomText.toUpperCase();
+            text.style.display = 'none';
+            text.setAttribute('id', 'text');
+            img.onload = randomTimer;
+            img.src = randomImage;
+            img.style.visibility = 'hidden';
+            img.setAttribute('id', 'img');
+            img.classList.add(randomImageEmotion)
+            imageContainer.className = '';
+            // add the text emotion ("sad", "happy"...) to imageContainer class. 
+            imageContainer.classList.add(randomText);
+            imageContainer.appendChild(img);
+            imageContainer.appendChild(text)
+
+        }
+        function showImage() {
+            const image = document.getElementById('img');
+            image.style.visibility = 'visible';
+            const text = document.getElementById('text');
+            text.style.display = 'inline';
+            result["startTime"] = performance.now();
+
+        }
+
+        function checkEmotion(chosenEmotion) {
+            if (isActive) {
+                result["endTime"] = performance.now();
+                result["chosenEmotion"] = chosenEmotion;
+                const emotionText = document.getElementById("imageContainer").className;
+                if (emotionText != chosenEmotion) {
+                    result["correctness"] = "incorrect";
+                } else {
+                    result["correctness"] = "correct";
+                }
+                // dev mode
+                // console.log(JSON.stringify(result));
+
+                // app mode
+                window.webkit.messageHandlers.ResearchKit.postMessage(JSON.stringify(result));
+
+            }
+
+        }
+
+        function activatecheckEmotion() {
+            isActive = true;
+        }
+
+
+
+        function randomTimer() {
+            const min = 2;
+            const max = 6;
+            let rand = Math.floor(Math.random() * (max - min + 1) + min);
+            // console.log('Wait for ' + rand + ' seconds');
+
+            setTimeout(activatecheckEmotion, rand * 1000)
+            setTimeout(showImage, rand * 1000);
+            setInterval(() => {
+                if (rand > 0) {
+                    console.log(rand - 1)
+                }
+                rand--
+            }, 1000)
+        }
+
+        generateImage();
+        // randomTimer();
+
+
+
+    </script>
+</body>
+
+</html>
