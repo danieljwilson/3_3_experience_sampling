@@ -11,6 +11,7 @@
 3_3_3_data_analysis/run1_dataExplore.ipynb
 daily_data/
 PaymentTestData/
+.venv
 
 # Ignore all logs #
 ###################
