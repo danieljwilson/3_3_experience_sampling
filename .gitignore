@@ -12,6 +12,7 @@
 daily_data/
 PaymentTestData/
 .venv
+3_3_4_outputs/EDA
 
 # Ignore all logs #
 ###################
