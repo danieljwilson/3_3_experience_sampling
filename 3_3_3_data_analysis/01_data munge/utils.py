@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import logging
 
 def all_dates_subjects_df(run_num, subjects):
     """
@@ -24,4 +25,12 @@ def all_dates_subjects_df(run_num, subjects):
     
     return df_complete_idDate
 
-
+def log_info(description: str, data_source: str, df, rows_pre):
+    """_summary_
+    Creates a logging message describing why
+    rows were removed and how many.
+    """
+    rows_post = df.shape[0]
+    rows_removed = rows_pre - rows_post
+    # Log cleaning
+    logging.info(f'{data_source} - {description} - removed {rows_removed} rows, or {(rows_removed/rows_pre)*100:.1f}%.')
