@@ -6,6 +6,10 @@
 */daily_data/*
 */PaymentTestData/*
 
+# Quarto
+###################
+3_3_3_data_analysis/02_analysis/run1/results_files/*
+
 3_3_1_raw_data/
 3_3_2_processed_data/
 3_3_3_data_analysis/run1_dataExplore.ipynb
