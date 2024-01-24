@@ -1,0 +1,119 @@
+---
+title: "Quarto Basics"
+format:
+  html:
+    code-fold: true
+jupyter: python3
+---
+
+## Results
+
+### Adherence
+It is tricky to come up with a singular value for adherence as there were multiple components to the experiment: digital trace data, self-report surveys and cognitive tasks. In general if someone completes one self report question they tend to complete all questions, and if someone completes one cogntive task they complete all cognitive tasks. For the digital trace data it is simply a matter of whether the subject enabled permissions that allowed us to collect the data streams we requested. Some subjects had to be reminded multiple times before they enabled permissions while others never did so.
+
+For an example of adherence levels looking at self-report data we can just look at responses to the question about negative affect (see @fig-adherence).
+
+```{python}
+#| label: fig-adherence
+#| fig-cap: "Number of days in which subjects provided a response to the question about negative affect"
+
+# IMPORTS
+import pandas as pd
+import numpy as np
+import missingno as msno
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.style.use('seaborn-v0_8-colorblind')
+plt.style.use('seaborn-v0_8-white')
+
+# LOAD DATA
+# load full df
+# load full df
+df1 = pd.read_csv('/Users/djw/Documents/pCloud_synced/Academics/Projects/2020_thesis/thesis_experiments/3_experiments/3_3_experience_sampling/3_3_2_processed_data/run_1/run1_full_daily_df.csv', low_memory=False)
+df2 = pd.read_csv('/Users/djw/Documents/pCloud_synced/Academics/Projects/2020_thesis/thesis_experiments/3_experiments/3_3_experience_sampling/3_3_2_processed_data/run_2/run2_full_daily_df.csv', low_memory=False)
+
+# Convert trial date to datetime
+df1['trial_date'] = pd.to_datetime(df1['trial_date']).dt.date
+df2['trial_date'] = pd.to_datetime(df2['trial_date']).dt.date
+# Rename column
+df1 = df1.rename(columns={'ParticipantIdentifier': 'PID'})
+df2 = df2.rename(columns={'ParticipantIdentifier': 'PID'})
+# concat run 1 and 2
+df = pd.concat([df1, df2], axis=0, join='outer')
+
+# CREATE GROUPED DF
+counts = pd.DataFrame(df.groupby('PID')[['affect_neg_angry', 'passive_sk_device_total_unlocks']].count().reset_index().sort_values(by='affect_neg_angry', ascending=False))
+counts = counts.rename(columns={'affect_neg_angry': 'counts_affect',
+                                'passive_sk_device_total_unlocks': 'counts_unlocks'
+                                })
+# Add cohort
+counts['cohort'] = counts['PID'].map(df.drop_duplicates('PID').set_index('PID')['cohort'])
+
+# PLOT
+ax = sns.histplot(data=counts, x="counts_affect", binwidth=5, hue='cohort')
+ax.set_xlabel('Affect (response days)')
+# Place the legend in the top left corner
+sns.move_legend(ax, "upper left")
+```
+
+For adherence in terms of passive data we can choose one of the variables from one of the data streams, for example `totalUnlocks` from the device usage data stream.
+
+```{python}
+#| label: fig-adherencePassive
+#| fig-cap: "Number of days in which subject device usage data was captured"
+
+# PLOT
+ax = sns.histplot(data=counts, x="counts_unlocks", binwidth=5, hue='cohort')
+ax.set_xlabel('Unlocks (days recoreded)')
+# Place the legend in the top left corner
+sns.move_legend(ax, "upper left")
+```
+
+
+- Passive
+- Correlation between adherence in two domains?
+
+- Note adherence difference between two cohorts which we are attributing mainly to the dashboard
+
+### Exploratory Data Analysis
+- Sleep patterns
+- Tower of Hanoi as individual difference/fingerprint
+- Feature Correlations/autoregression
+
+### Missing data
+(before EDA?)
+What is our approach?
+
+### Sticky States?
+- Hidden markov model
+- Look at individual differences
+  - Correlates with other individual characteristics
+
+### What predicts average IB Gap?
+
+### Predicting state level gap
+
+Feature engineering
+- lag features
+- rolling window statistics
+
+For a demonstration of a line plot on a polar axis, see @fig-polar.
+
+```{python}
+#| label: fig-polar
+#| fig-cap: "A line plot on a polar axis"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+r = np.arange(0, 2, 0.01)
+theta = 4 * np.pi * r
+fig, ax = plt.subplots(
+  subplot_kw = {'projection': 'polar'} 
+)
+ax.plot(theta, r)
+ax.set_rticks([0.5, 1, 1.5, 2])
+ax.grid(True)
+plt.show()
+```
