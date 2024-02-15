@@ -105,6 +105,6 @@ class Node():
 
         # Probability to add?
         if prob and annotate:
-            text = f"{prob*100 if percentages else prob:.1f}".rstrip("0").rstrip(".")
+            text = f"{prob*100 if percentages else prob:.2f}".rstrip("0").rstrip(".")
             text += "%" if percentages else ""
             ax.annotate(text, xy=(self.x, prob_y), color='#000000', **self.text_args)
