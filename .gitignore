@@ -7,6 +7,10 @@
 */PaymentTestData/*
 __pycache__/
 
+# Ignore specific files #
+#########################
+df_good.csv
+
 # Quarto
 ###################
 3_3_3_data_analysis/02_analysis/run1/results_files/*
