@@ -10,6 +10,8 @@ __pycache__/
 # Ignore specific files #
 #########################
 df_good.csv
+X.csv
+ys.csv
 
 # Quarto
 ###################
