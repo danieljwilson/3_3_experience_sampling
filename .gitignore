@@ -6,12 +6,14 @@
 */daily_data/*
 */PaymentTestData/*
 __pycache__/
+*/heba/*
 
 # Ignore specific files #
 #########################
 df_good.csv
 X.csv
 ys.csv
+checkpoint.pt
 
 # Quarto
 ###################
