@@ -22,6 +22,107 @@ def convert_column_to_binary(df, column_name):
 
 df = pd.read_csv('../02_analysis/df_good.csv')
 
+def subject_df_no_feat_eng(df, sub_num):
+
+    # Convert 'trial_date' to datetime and sort the dataframe
+    df['trial_date'] = pd.to_datetime(df['trial_date'])
+    # Sort
+    df = df.sort_values(by=['PID', 'trial_date'])
+
+    # Subject PID
+    subject = np.unique(df.PID)[sub_num]
+
+    # Convert all columns to numeric, setting errors='coerce' will convert non-convertible values to NaN
+    df_numeric = df.loc[df.PID == subject].apply(pd.to_numeric, errors='coerce')
+    
+    X = df_numeric.copy()
+    
+    # Extract categorical features
+    cat_cols = ['day_of_week', 'task_nback_mode']
+    X.drop(columns=cat_cols, inplace=True)
+    
+    # Remove app/web columns for device usage as these are then totaled
+    web_cols = [col for col in X.columns if 'passive_sk_device_web_usage' in col]
+    app_cols = [col for col in X.columns if 'passive_sk_device_app_usage' in col]
+
+    X.drop(columns=web_cols, inplace=True)
+    X.drop(columns=app_cols, inplace=True)
+    
+    # Remove trial date - using day
+    day = X.day
+    X.drop(columns=['trial_date', 'day'], inplace=True)
+    
+    
+    # remove existing residual columns since we will be calculating differences/residuals for all columns
+    cols = [col for col in X.columns if 'residual' in col]
+    X.drop(columns=cols, inplace=True)
+    
+    # z scored some rts, can remove those
+    cols = [col for col in X.columns if 'rt_z' in col]
+    X.drop(columns=cols, inplace=True)
+    
+    # Using the average RT
+    X.drop(['task_rt_1', 'task_rt_2', 'task_rt_3', 'task_rt_4'], axis=1, inplace=True)
+    
+    # remove keyboard sentiment for emoji and word individually since they are combined
+    cols = [col for col in X.columns if 'keyboard_sentiment_emoji' in col]
+    X.drop(columns=cols, inplace=True)
+    
+    # remove keyboard sentiment for emoji and word individually since they are combined
+    cols = [col for col in X.columns if 'keyboard_sentiment_word' in col]
+    X.drop(columns=cols, inplace=True)
+    
+    # remove device sentiment as this is an error
+    cols = [col for col in X.columns if 'device_sentiment' in col]
+    X.drop(columns=cols, inplace=True)
+    
+    # Remove simple gap which is just sr_DAILY_past24_gap
+    X.drop(columns='sr_gap_simple', inplace=True)
+    
+    # Remove columns with NaN counts about threshold
+    threshold_nan = 0.5
+
+    nan_counts = X.isna().sum()
+    cols_to_drop_due_to_nans = nan_counts[nan_counts > len(X) * threshold_nan].index
+    X = X.drop(columns=cols_to_drop_due_to_nans)
+    
+    # print(f'Removed {len(cols_to_drop_due_to_nans)} features due to NaNs...')
+    
+    # Scale using Min-Max Normalization
+    # print("Applying min-max scaling...")
+    X = (X-X.min(axis=0))/(X.max(axis=0)-X.min(axis=0))
+
+    # Remove columns with almost no variance
+    # Set threshold
+    var_threshold = .01
+
+    no_var_cols = X.loc[:, np.var(X) <= var_threshold].columns
+    ## X = X.loc[:, np.var(X) > var_threshold]
+
+    # print(f'Removed {len(no_var_cols)} features due to Var <= {var_threshold} after scaling...')
+    
+    # if the max and min value were the same var they now equal NaN...remove these
+    nan_counts = X.isna().sum()
+    cols_to_drop_due_to_nans = nan_counts[nan_counts > len(X) * threshold_nan].index
+    X = X.drop(columns=cols_to_drop_due_to_nans)
+
+    # print(f'Removed {len(cols_to_drop_due_to_nans)} features due to NaNs after scaling...')
+    
+    # Compute the correlation matrix - need at least 20 values
+    corr_matrix = X.corr(method='pearson', min_periods=20).abs()
+    
+    # Define the threshold
+    threshold = 0.95
+    
+    # Identify pairs of highly correlated features
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+    
+    # Drop highly correlated columns
+    X = X.drop(to_drop, axis=1)
+    
+    return X
+
 def subject_df(df, sub_num):
 
     # Convert 'trial_date' to datetime and sort the dataframe
@@ -250,7 +351,7 @@ def subject_df(df, sub_num):
     
     # Identify pairs of highly correlated features
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold) and column != 'sr_gap_heuristic']
     
     # Drop highly correlated columns
     X = X.drop(to_drop, axis=1)
