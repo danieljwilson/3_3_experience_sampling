@@ -351,10 +351,12 @@ def subject_df(df, sub_num):
     
     # Identify pairs of highly correlated features
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    to_drop = [column for column in upper.columns if any(upper[column] > threshold) and column != 'sr_gap_heuristic']
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
     
     # Drop highly correlated columns
     X = X.drop(to_drop, axis=1)
+    
+    X['sr_gap_heuristic'] = df['sr_gap_heuristic']
     
     # Dummy Code Categorical features
     X['sr_gap_entry'] = convert_column_to_binary(X, 'sr_gap_heuristic')

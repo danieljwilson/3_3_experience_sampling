@@ -14,6 +14,7 @@ df_good.csv
 X.csv
 ys.csv
 checkpoint.pt
+mlm_results.csv
 
 # Quarto
 ###################
