@@ -1,0 +1,23 @@
+---
+description: 
+globs: **/*.ipynb,**/*.py
+alwaysApply: false
+---
+---
+description: Generate publication-ready figures that satisfy APA 7th-edition guidelines
+globs:
+  - "**/figures/**"
+  - "**/*.ipynb"
+  - "**/*.py"
+alwaysApply: false
+---
+
+- Use **matplotlib** with sans-serif font family `Arial` (10–12 pt) and black text. Title case, italicised figure titles beneath the figure number.:contentReference[oaicite:4]{index=4}
+- Axis labels sentence-case; only initial capitals for proper nouns.
+- Apply **color-blind-safe palettes** (e.g., `mpl.cycler` with blue-orange-green); ensure ≥ 3:1 contrast.:contentReference[oaicite:5]{index=5}
+- Restrict gridlines to subtle gray (#d9d9d9) dashed lines; remove chartjunk.
+- Single-column figures: width 5–8.4 cm; two-column: 10.6–17.5 cm; height never exceeds page margins.:contentReference[oaicite:6]{index=6}
+- Add succinct **“Note.”** below figure where clarifications, abbreviations, or copyright statements are needed.:contentReference[oaicite:7]{index=7}
+- Save vector graphics as `PDF` (preferred) or high-res `PNG` (≥ 600 dpi).
+- Use descriptive, snake-case filenames (`fig_stroop_rt_by_condition.pdf`).
+- Embed code snippet for consistent style: `plt.rcParams.update({...})` (see `@mpl_apa_style.py` for full template).

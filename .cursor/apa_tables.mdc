@@ -1,0 +1,20 @@
+---
+description: 
+globs: **/*.ipynb,**/*.py
+alwaysApply: false
+---
+---
+description: Auto-format analytic output into APA 7 compliant tables
+globs:
+  - "**/tables/**"
+  - "**/*.ipynb"
+  - "**/*.py"
+alwaysApply: false
+---
+
+- Column headings sentence-case; table title in italics on a new line beneath the table number.:contentReference[oaicite:9]{index=9}
+- Use only **top, header-under, and bottom rules** (no vertical borders).:contentReference[oaicite:10]{index=10}
+- Align numeric columns on decimal points; missing data coded “—”.
+- Provide **Notes** in order: general, specific, probability (*p*) values. Place flush-left beneath bottom rule.:contentReference[oaicite:11]{index=11}
+- Default font: Times New Roman 12 pt; spacing 1.15 within cells, 1 blank line before/after table.
+- Support reproducible generation via the `apaTables` (R) or `pyapa` helper functions (see `@apa_table_helpers.py`).:contentReference[oaicite:12]{index=12}

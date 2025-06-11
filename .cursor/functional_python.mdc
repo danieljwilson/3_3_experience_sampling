@@ -1,0 +1,22 @@
+---
+description: 
+globs: **/*.py
+alwaysApply: false
+---
+---
+description: Enforce functional-programming and high-quality Python practices for all thesis source code
+globs:
+  - "**/*.py"
+alwaysApply: false      # Auto-Attached when any *.py is in context
+---
+
+- Write **pure, stateless functions** wherever feasible; avoid mutation and rely on return values for state propagation.
+- Compose behaviour with `map`, `filter`, `reduce`, `itertools`, and `functools.partial` rather than imperatively iterating.
+- Follow **PEP 8** for naming, spacing, and 88-column line length (run `black` pre-commit).:contentReference[oaicite:0]{index=0}
+- Provide **Google-style docstrings** that satisfy **PEP 257** (1-line summary + Args/Returns/Examples).:contentReference[oaicite:1]{index=1}
+- Keep functions ≤ 40 LOC; defer shared helpers to `utils/`.
+- Type-annotate all public APIs and run `mypy --strict`.
+- Prefer `dataclasses.dataclass(frozen=True)` for value objects.
+- Treat warnings as errors; configure `ruff` (or `flake8`) with `--select E,F,I,W,C90` for linting.:contentReference[oaicite:2]{index=2}
+- Include property-based tests with `hypothesis` plus standard `pytest` unit tests.
+
